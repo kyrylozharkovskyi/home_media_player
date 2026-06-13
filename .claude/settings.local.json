@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(\\(Get-Item \"d:\\\\films_site\\\\node_modules\\\\electron\\\\dist\\\\electron.exe\"\\).VersionInfo | Select-Object FileVersion, ProductVersion, ProductName)"
+    ]
+  }
+}
