@@ -623,11 +623,23 @@ input  { font-family: var(--font-ui); color: inherit; font-size: inherit; }
 }
 
 /* ── Historia tab ─────────────────────────────────────────────────── */
+.history-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px; gap: 16px;
+}
 .history-tabs {
-  display: flex; gap: 0; margin-bottom: 24px;
+  display: flex; gap: 0;
   border: 1px solid var(--border); border-radius: 6px;
   overflow: hidden; width: fit-content;
 }
+.btn-clear-history {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  letter-spacing: .4px; color: var(--muted);
+  border: 1px solid var(--border); background: transparent;
+  transition: all .18s; flex-shrink: 0;
+}
+.btn-clear-history:hover { border-color: var(--red); color: var(--red); background: rgba(229,57,53,.08); }
 .hist-tab-btn {
   padding: 8px 26px;
   font-family: var(--font-ui); font-size: 12px; font-weight: 500; letter-spacing: .6px;

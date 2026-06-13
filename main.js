@@ -218,6 +218,16 @@ ipcMain.handle('get-total-count', () => {
   return getTotalCount();
 });
 
+ipcMain.handle('mark-folder-deleted', (_e, folderPath) => {
+  const { markFolderDeleted } = require('./src/db');
+  markFolderDeleted(folderPath);
+});
+
+ipcMain.handle('clear-history', () => {
+  const { clearHistory } = require('./src/db');
+  clearHistory();
+});
+
 // ── Navigation ────────────────────────────────────────────────────────────────
 ipcMain.on('go-home', () => {
   if (mainWindow) mainWindow.loadFile('renderer/index.html');

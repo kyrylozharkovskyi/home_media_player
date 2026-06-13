@@ -110,9 +110,15 @@
   <!-- ── Historia ─────────────────────────────────────────────────── -->
   <div class="page" id="page-history">
 
-    <div class="history-tabs">
-      <button class="hist-tab-btn active" data-list="unwatched" data-i18n="hist_unwatched">Не переглянуті</button>
-      <button class="hist-tab-btn"        data-list="watched"   data-i18n="hist_watched">Переглянуті</button>
+    <div class="history-header">
+      <div class="history-tabs">
+        <button class="hist-tab-btn active" data-list="unwatched" data-i18n="hist_unwatched">Не переглянуті</button>
+        <button class="hist-tab-btn"        data-list="watched"   data-i18n="hist_watched">Переглянуті</button>
+      </div>
+      <button class="btn-clear-history" id="btn-clear-history">
+        <i class="fas fa-trash-alt"></i>
+        <span data-i18n="clear_history">Очистити всю історію</span>
+      </button>
     </div>
 
     <div id="hist-unwatched-list" class="hist-list"></div>

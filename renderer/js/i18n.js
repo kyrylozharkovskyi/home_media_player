@@ -59,6 +59,8 @@ const TRANSLATIONS = {
     hist_file_deleted:  'Файл видалено з диска',
     hist_empty_watched:   'Немає переглянутих фільмів.\nПосмотрите хоч один до 70% і він з\'явиться тут.',
     hist_empty_unwatched: 'Немає незакінчених фільмів.',
+    clear_history:        'Очистити всю історію',
+    clear_history_confirm:'Очистити всю історію перегляду? Цю дію не можна скасувати.',
 
     group_label: 'Нова Група',
     group_empty: 'Немає відео у цій групі.',
@@ -120,6 +122,8 @@ const TRANSLATIONS = {
     hist_file_deleted:  'Plik usunięty z dysku',
     hist_empty_watched:   'Brak obejrzanych filmów.\nObejrzyj coś do 70% — pojawi się tutaj.',
     hist_empty_unwatched: 'Brak nieukończonych filmów.',
+    clear_history:        'Wyczyść całą historię',
+    clear_history_confirm:'Wyczyścić całą historię oglądania? Tej operacji nie można cofnąć.',
 
     group_label: 'Nowa Grupa',
     group_empty: 'Brak wideo w tej grupie.',

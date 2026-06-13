@@ -245,6 +245,24 @@ function getUnwatched() {
   })).sort((a, b) => b.last_watched - a.last_watched);
 }
 
+function markFolderDeleted(folderPath) {
+  const norm = path.normalize(folderPath);
+  const base = norm.endsWith(path.sep) ? norm : norm + path.sep;
+  let changed = false;
+  for (const m of movies) {
+    if (!m.file_deleted && path.normalize(m.file_path).startsWith(base)) {
+      m.file_deleted = true;
+      changed = true;
+    }
+  }
+  if (changed) saveMovies();
+}
+
+function clearHistory() {
+  progress = {};
+  saveProgress();
+}
+
 function markFilesDeleted(foundPaths, scannedFolders) {
   const pathSet   = new Set(foundPaths.map(p => path.normalize(p)));
   const normFolders = scannedFolders.map(f => {
@@ -313,5 +331,6 @@ module.exports = {
   getWatchProgress, saveWatchProgress, getLastWatched,
   getHistory, getUnwatched, markFilesDeleted,
   getGroupData, getTotalCount,
+  markFolderDeleted, clearHistory,
   DATA_DIR, THUMBS_DIR
 };

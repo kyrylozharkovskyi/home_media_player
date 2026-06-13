@@ -578,6 +578,14 @@ function bindHistory() {
       document.getElementById('hist-watched-list').style.display   = list === 'watched'   ? '' : 'none';
     });
   });
+
+  document.getElementById('btn-clear-history').addEventListener('click', async () => {
+    if (!window.confirm(t('clear_history_confirm'))) return;
+    await api.clearHistory();
+    watchProgress = {};
+    await refresh();
+    showToast(t('clear_history'));
+  });
 }
 
 // ── Settings ──────────────────────────────────────────────────────────────────
@@ -648,12 +656,13 @@ function renderFolderList() {
       mamaFolders  = mamaFolders.filter(x => x !== removed);
       groupFolders = groupFolders.filter(x => x !== removed);
       await Promise.all([
+        api.markFolderDeleted(removed),
         api.saveSettings('scan_folders',  JSON.stringify(scanFolders)),
         api.saveSettings('mama_folders',  JSON.stringify(mamaFolders)),
         api.saveSettings('group_folders', JSON.stringify(groupFolders)),
       ]);
       renderFolderList();
-      renderMama();
+      await refresh();
       renderGroupTabs();
       groupFolders.forEach(fp => renderGroup(fp));
     });

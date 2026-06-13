@@ -21,6 +21,8 @@ contextBridge.exposeInMainWorld('api', {
   getUnwatched:       ()           => ipcRenderer.invoke('get-unwatched'),
   getGroupData:       (fp)         => ipcRenderer.invoke('get-group-data', fp),
   getTotalCount:      ()           => ipcRenderer.invoke('get-total-count'),
+  markFolderDeleted:  (fp)         => ipcRenderer.invoke('mark-folder-deleted', fp),
+  clearHistory:       ()           => ipcRenderer.invoke('clear-history'),
   openPlayer:         (id)         => ipcRenderer.invoke('open-player', id),
   closePlayer:        ()           => ipcRenderer.send('close-player'),
   onScanComplete:     (cb)         => ipcRenderer.on('scan-complete', cb),
