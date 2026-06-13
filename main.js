@@ -228,6 +228,11 @@ ipcMain.handle('clear-history', () => {
   clearHistory();
 });
 
+ipcMain.handle('factory-reset', () => {
+  const { factoryReset } = require('./src/db');
+  factoryReset();
+});
+
 // ── Navigation ────────────────────────────────────────────────────────────────
 ipcMain.on('go-home', () => {
   if (mainWindow) mainWindow.loadFile('renderer/index.html');

@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld('api', {
   getTotalCount:      ()           => ipcRenderer.invoke('get-total-count'),
   markFolderDeleted:  (fp)         => ipcRenderer.invoke('mark-folder-deleted', fp),
   clearHistory:       ()           => ipcRenderer.invoke('clear-history'),
+  factoryReset:       ()           => ipcRenderer.invoke('factory-reset'),
   openPlayer:         (id)         => ipcRenderer.invoke('open-player', id),
   closePlayer:        ()           => ipcRenderer.send('close-player'),
   onScanComplete:     (cb)         => ipcRenderer.on('scan-complete', cb),

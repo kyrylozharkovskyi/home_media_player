@@ -683,6 +683,20 @@ function bindSettings() {
     }
   });
 
+  document.getElementById('btn-factory-reset').addEventListener('click', async () => {
+    if (!window.confirm(t('factory_reset_confirm'))) return;
+    await api.factoryReset();
+    scanFolders  = [];
+    mamaFolders  = [];
+    groupFolders = [];
+    watchProgress = {};
+    allMovies = []; allFilms = []; allGenres = []; lastRecent = []; lastSeries = []; lastWatched = null;
+    renderFolderList();
+    renderGroupTabs();
+    await refresh();
+    showToast(t('factory_reset_done'));
+  });
+
   document.getElementById('btn-scan').addEventListener('click', async () => {
     const btn    = document.getElementById('btn-scan');
     const status = document.getElementById('scan-status');

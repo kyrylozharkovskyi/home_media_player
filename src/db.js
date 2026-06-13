@@ -245,6 +245,17 @@ function getUnwatched() {
   })).sort((a, b) => b.last_watched - a.last_watched);
 }
 
+function factoryReset() {
+  movies = [];
+  byPath = {};
+  nextId = 1;
+  progress = {};
+  settings = {};
+  saveMovies();
+  saveProgress();
+  saveSettingsFile();
+}
+
 function markFolderDeleted(folderPath) {
   const norm = path.normalize(folderPath);
   const base = norm.endsWith(path.sep) ? norm : norm + path.sep;
@@ -331,6 +342,6 @@ module.exports = {
   getWatchProgress, saveWatchProgress, getLastWatched,
   getHistory, getUnwatched, markFilesDeleted,
   getGroupData, getTotalCount,
-  markFolderDeleted, clearHistory,
+  markFolderDeleted, clearHistory, factoryReset,
   DATA_DIR, THUMBS_DIR
 };

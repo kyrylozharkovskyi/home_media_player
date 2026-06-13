@@ -544,6 +544,18 @@ input  { font-family: var(--font-ui); color: inherit; font-size: inherit; }
 }
 .settings-section h3 i { color: var(--accent); }
 
+.settings-danger { border: 1px solid rgba(229,57,53,.25); border-radius: var(--radius); padding: 20px; }
+.settings-danger h3 { color: var(--red); border-bottom-color: rgba(229,57,53,.25); }
+.settings-danger h3 i { color: var(--red); }
+.danger-desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+.btn-danger {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 20px; border-radius: 6px; font-size: 13px; font-weight: 500;
+  border: 1px solid var(--red); color: var(--red); background: transparent;
+  transition: all .18s;
+}
+.btn-danger:hover { background: var(--red); color: #fff; }
+
 .folder-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
 .folder-item {
   display: flex; align-items: center; gap: 12px;

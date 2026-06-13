@@ -61,6 +61,11 @@ const TRANSLATIONS = {
     hist_empty_unwatched: 'Немає незакінчених фільмів.',
     clear_history:        'Очистити всю історію',
     clear_history_confirm:'Очистити всю історію перегляду? Цю дію не можна скасувати.',
+    factory_reset:        'Скинути всі дані',
+    factory_reset_confirm:'Видалити ВСІ дані додатку?\n\nБудуть видалені:\n• Всі відскановані фільми\n• Вся історія перегляду\n• Всі папки з налаштувань\n\nЦю дію не можна скасувати.',
+    factory_reset_done:   'Дані очищено. Додайте папки і запустіть сканування.',
+    factory_reset_desc:   'Видаляє всі відскановані фільми, історію перегляду та всі налаштовані папки.',
+    settings_danger:      'Небезпечна зона',
 
     group_label: 'Нова Група',
     group_empty: 'Немає відео у цій групі.',
@@ -124,6 +129,11 @@ const TRANSLATIONS = {
     hist_empty_unwatched: 'Brak nieukończonych filmów.',
     clear_history:        'Wyczyść całą historię',
     clear_history_confirm:'Wyczyścić całą historię oglądania? Tej operacji nie można cofnąć.',
+    factory_reset:        'Resetuj wszystkie dane',
+    factory_reset_confirm:'Usunąć WSZYSTKIE dane aplikacji?\n\nZostaną usunięte:\n• Wszystkie zeskanowane filmy\n• Cała historia oglądania\n• Wszystkie foldery z ustawień\n\nTej operacji nie można cofnąć.',
+    factory_reset_done:   'Dane wyczyszczone. Dodaj foldery i uruchom skanowanie.',
+    factory_reset_desc:   'Usuwa wszystkie zeskanowane filmy, historię oglądania i wszystkie skonfigurowane foldery.',
+    settings_danger:      'Strefa niebezpieczna',
 
     group_label: 'Nowa Grupa',
     group_empty: 'Brak wideo w tej grupie.',
