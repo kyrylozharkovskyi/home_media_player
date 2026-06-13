@@ -213,6 +213,11 @@ ipcMain.handle('get-group-data', (_e, folderPath) => {
   return getGroupData(folderPath);
 });
 
+ipcMain.handle('get-total-count', () => {
+  const { getTotalCount } = require('./src/db');
+  return getTotalCount();
+});
+
 // ── Navigation ────────────────────────────────────────────────────────────────
 ipcMain.on('go-home', () => {
   if (mainWindow) mainWindow.loadFile('renderer/index.html');

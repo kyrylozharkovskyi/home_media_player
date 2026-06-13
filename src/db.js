@@ -45,15 +45,33 @@ function initDB() {
   settings = loadJSON(SETTINGS_F, {});
 }
 
+// ── Group folder helpers ──────────────────────────────────────────────────────
+function _groupNormalized() {
+  try {
+    const arr = settings['group_folders'] ? JSON.parse(settings['group_folders']) : [];
+    return arr.map(f => { const n = path.normalize(f); return n.endsWith(path.sep) ? n : n + path.sep; });
+  } catch { return []; }
+}
+
+function _inGroup(m, groupFolders) {
+  const n = path.normalize(m.file_path);
+  return groupFolders.some(f => n.startsWith(f));
+}
+
 // ── Movies ────────────────────────────────────────────────────────────────────
 function getMovies(filter) {
-  let list = movies.filter(m => !m.file_deleted);
+  const gf = _groupNormalized();
+  const base = m => !m.file_deleted && !_inGroup(m, gf);
+
+  let list;
   if (filter) {
     const q = filter.toLowerCase();
-    list = movies.filter(m =>
+    list = movies.filter(m => base(m) && (
       (m.title || '').toLowerCase().includes(q) ||
       (m.series_name || '').toLowerCase().includes(q)
-    );
+    ));
+  } else {
+    list = movies.filter(base);
   }
   return list.slice().sort((a, b) => {
     const ka = (a.series_name || a.title || '').toLowerCase();
@@ -65,9 +83,11 @@ function getMovies(filter) {
 }
 
 function getSeries() {
+  const gf  = _groupNormalized();
   const map = {};
   for (const m of movies) {
     if (!m.is_series || !m.series_name || m.file_deleted) continue;
+    if (_inGroup(m, gf)) continue;
     if (!map[m.series_name]) map[m.series_name] = { name: m.series_name, seasons: new Set(), episodes: [] };
     map[m.series_name].seasons.add(m.season);
     map[m.series_name].episodes.push(m);
@@ -82,7 +102,15 @@ function getSeries() {
 }
 
 function getRecentMovies(limit = 12) {
-  return movies.filter(m => !m.file_deleted).slice().sort((a, b) => (b.file_mtime || 0) - (a.file_mtime || 0)).slice(0, limit);
+  const gf = _groupNormalized();
+  return movies
+    .filter(m => !m.file_deleted && !_inGroup(m, gf))
+    .slice().sort((a, b) => (b.file_mtime || 0) - (a.file_mtime || 0))
+    .slice(0, limit);
+}
+
+function getTotalCount() {
+  return movies.filter(m => !m.file_deleted).length;
 }
 
 function getMovieById(id) {
@@ -235,7 +263,7 @@ function markFilesDeleted(foundPaths, scannedFolders) {
   if (changed) saveMovies();
 }
 
-// ── Group collection (custom folder tab) ──────────────────────────────────────
+// ── Group collection — grouped by immediate subdirectory ─────────────────────
 function getGroupData(folderPath) {
   const norm = path.normalize(folderPath);
   const base = norm.endsWith(path.sep) ? norm : norm + path.sep;
@@ -244,30 +272,35 @@ function getGroupData(folderPath) {
     !m.file_deleted && path.normalize(m.file_path).startsWith(base)
   );
 
-  const seriesMap = {};
+  // Split by first subdirectory level
+  const subgroupMap = {};
   const standalones = [];
   for (const m of inFolder) {
-    if (m.is_series && m.series_name) {
-      if (!seriesMap[m.series_name])
-        seriesMap[m.series_name] = { name: m.series_name, seasons: new Set(), episodes: [] };
-      seriesMap[m.series_name].seasons.add(m.season);
-      seriesMap[m.series_name].episodes.push(m);
+    const rel   = path.normalize(m.file_path).slice(base.length);
+    const parts = rel.split(path.sep);
+    if (parts.length > 1) {
+      const key = parts[0];
+      if (!subgroupMap[key]) subgroupMap[key] = [];
+      subgroupMap[key].push(m);
     } else {
       standalones.push(m);
     }
   }
 
-  const series = Object.values(seriesMap)
-    .sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1)
-    .map(s => ({
-      name:     s.name,
-      seasons:  [...s.seasons].filter(Boolean).sort((a, b) => a - b),
-      episodes: s.episodes.sort((a, b) => (a.season - b.season) || (a.episode - b.episode))
+  const groups = Object.entries(subgroupMap)
+    .sort(([a], [b]) => a.toLowerCase() < b.toLowerCase() ? -1 : 1)
+    .map(([name, items]) => ({
+      name,
+      episodes: items.sort((a, b) => {
+        if ((a.season || 0) !== (b.season || 0)) return (a.season || 0) - (b.season || 0);
+        if ((a.episode || 0) !== (b.episode || 0)) return (a.episode || 0) - (b.episode || 0);
+        return (a.title || '').toLowerCase() < (b.title || '').toLowerCase() ? -1 : 1;
+      })
     }));
 
   return {
-    series,
-    movies: standalones.sort((a, b) =>
+    groups,
+    standalones: standalones.sort((a, b) =>
       (a.title || '').toLowerCase() < (b.title || '').toLowerCase() ? -1 : 1
     )
   };
@@ -279,6 +312,6 @@ module.exports = {
   getMamaMovies, getMamaRecent,
   getWatchProgress, saveWatchProgress, getLastWatched,
   getHistory, getUnwatched, markFilesDeleted,
-  getGroupData,
+  getGroupData, getTotalCount,
   DATA_DIR, THUMBS_DIR
 };

@@ -153,7 +153,7 @@ async function refresh() {
   const sfiEl = document.getElementById('stat-files');
   if (sfEl)  sfEl.textContent  = allFilms.length;
   if (ssEl)  ssEl.textContent  = series.length;
-  if (sfiEl) sfiEl.textContent = allMovies.length;
+  if (sfiEl) api.getTotalCount().then(n => { sfiEl.textContent = n; });
 }
 
 // ── Horizontal scroll (wheel + carousel arrows) ───────────────────────────────
@@ -255,42 +255,32 @@ async function renderGroup(fp) {
   const cont = document.getElementById(`${id}-content`);
   if (!cont) return;
 
-  const data = await api.getGroupData(fp);
-  const { series, movies } = data;
+  const { groups, standalones } = await api.getGroupData(fp);
 
-  if (!series.length && !movies.length) {
+  if (!groups.length && !standalones.length) {
     cont.innerHTML = emptyState('fas fa-layer-group', t('group_empty'));
     return;
   }
 
-  let html = '';
+  let html = groups.map(g => `
+    <div class="series-group open" data-series="${esc(g.name)}">
+      <div class="series-header">
+        <span class="series-chevron"><i class="fas fa-chevron-right"></i></span>
+        <span class="series-name">${esc(g.name)}</span>
+        <span class="series-count">${g.episodes.length} ${t('episodes')}</span>
+      </div>
+      <div class="series-body">
+        <div class="grid">${g.episodes.map(m => movieCardHTML(m, false)).join('')}</div>
+      </div>
+    </div>`).join('');
 
-  if (series.length) {
-    html += series.map(s => {
-      const bySeasons   = groupBy(s.episodes, e => e.season);
-      const seasonsHTML = Object.entries(bySeasons).map(([season, eps]) => `
-        <div class="season-label">${t('season')} ${season}</div>
-        <div class="grid">${eps.map(m => movieCardHTML(m, false)).join('')}</div>
-      `).join('');
-      return `
-        <div class="series-group open" data-series="${esc(s.name)}">
-          <div class="series-header">
-            <span class="series-chevron"><i class="fas fa-chevron-right"></i></span>
-            <span class="series-name">${esc(s.name)}</span>
-            <span class="series-count">${s.episodes.length} ${t('episodes')} · ${s.seasons.length} ${t('seasons')}</span>
-          </div>
-          <div class="series-body">${seasonsHTML}</div>
-        </div>`;
-    }).join('');
-  }
-
-  if (movies.length) {
+  if (standalones.length) {
     html += `
-      <div class="section-title" style="margin-top:${series.length ? '24px' : '0'}">
+      <div class="section-title" style="margin-top:${groups.length ? '24px' : '0'}">
         <i class="fas fa-film"></i>
         <span>${t('movies_title')}</span>
       </div>
-      <div class="grid">${movies.map(m => movieCardHTML(m, false)).join('')}</div>`;
+      <div class="grid">${standalones.map(m => movieCardHTML(m, false)).join('')}</div>`;
   }
 
   cont.innerHTML = html;

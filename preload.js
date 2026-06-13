@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld('api', {
   getHistory:         ()           => ipcRenderer.invoke('get-history'),
   getUnwatched:       ()           => ipcRenderer.invoke('get-unwatched'),
   getGroupData:       (fp)         => ipcRenderer.invoke('get-group-data', fp),
+  getTotalCount:      ()           => ipcRenderer.invoke('get-total-count'),
   openPlayer:         (id)         => ipcRenderer.invoke('open-player', id),
   closePlayer:        ()           => ipcRenderer.send('close-player'),
   onScanComplete:     (cb)         => ipcRenderer.on('scan-complete', cb),
