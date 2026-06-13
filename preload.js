@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld('api', {
   goHome:             ()           => ipcRenderer.send('go-home'),
   getMamaMovies:      ()           => ipcRenderer.invoke('get-mama-movies'),
   getMamaRecent:      ()           => ipcRenderer.invoke('get-mama-recent'),
+  getMamaData:        ()           => ipcRenderer.invoke('get-mama-data'),
+  onPlayerClosed:     (cb)         => ipcRenderer.on('player-closed', cb),
   getHistory:         ()           => ipcRenderer.invoke('get-history'),
   getUnwatched:       ()           => ipcRenderer.invoke('get-unwatched'),
   getGroupData:       (fp)         => ipcRenderer.invoke('get-group-data', fp),

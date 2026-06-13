@@ -195,7 +195,19 @@ ipcMain.handle('open-player', (_e, movieId) => {
 
 ipcMain.on('close-player', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
-  if (win) win.close();
+  if (win) {
+    win.once('closed', () => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('player-closed');
+      }
+    });
+    win.close();
+  }
+});
+
+ipcMain.handle('get-mama-data', () => {
+  const { getMamaData } = require('./src/db');
+  return getMamaData();
 });
 
 ipcMain.handle('get-history', () => {

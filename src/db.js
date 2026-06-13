@@ -45,7 +45,7 @@ function initDB() {
   settings = loadJSON(SETTINGS_F, {});
 }
 
-// ── Group folder helpers ──────────────────────────────────────────────────────
+// ── Folder exclusion helpers ──────────────────────────────────────────────────
 function _groupNormalized() {
   try {
     const arr = settings['group_folders'] ? JSON.parse(settings['group_folders']) : [];
@@ -53,15 +53,20 @@ function _groupNormalized() {
   } catch { return []; }
 }
 
-function _inGroup(m, groupFolders) {
+function _inFolder(m, folders) {
   const n = path.normalize(m.file_path);
-  return groupFolders.some(f => n.startsWith(f));
+  return folders.some(f => n.startsWith(f));
+}
+
+// Folders whose movies should be hidden from main views (mama + group)
+function _excludedFolders() {
+  return [..._mamaNormalized(), ..._groupNormalized()];
 }
 
 // ── Movies ────────────────────────────────────────────────────────────────────
 function getMovies(filter) {
-  const gf = _groupNormalized();
-  const base = m => !m.file_deleted && !_inGroup(m, gf);
+  const excl = _excludedFolders();
+  const base = m => !m.file_deleted && !_inFolder(m, excl);
 
   let list;
   if (filter) {
@@ -83,11 +88,11 @@ function getMovies(filter) {
 }
 
 function getSeries() {
-  const gf  = _groupNormalized();
-  const map = {};
+  const excl = _excludedFolders();
+  const map  = {};
   for (const m of movies) {
     if (!m.is_series || !m.series_name || m.file_deleted) continue;
-    if (_inGroup(m, gf)) continue;
+    if (_inFolder(m, excl)) continue;
     if (!map[m.series_name]) map[m.series_name] = { name: m.series_name, seasons: new Set(), episodes: [] };
     map[m.series_name].seasons.add(m.season);
     map[m.series_name].episodes.push(m);
@@ -102,9 +107,9 @@ function getSeries() {
 }
 
 function getRecentMovies(limit = 12) {
-  const gf = _groupNormalized();
+  const excl = _excludedFolders();
   return movies
-    .filter(m => !m.file_deleted && !_inGroup(m, gf))
+    .filter(m => !m.file_deleted && !_inFolder(m, excl))
     .slice().sort((a, b) => (b.file_mtime || 0) - (a.file_mtime || 0))
     .slice(0, limit);
 }
@@ -197,8 +202,43 @@ function getMamaMovies() {
   const folders = _mamaNormalized();
   if (!folders.length) return [];
   return movies
-    .filter(m => !m.file_deleted && folders.some(f => path.normalize(m.file_path).startsWith(f)))
+    .filter(m => !m.file_deleted && _inFolder(m, folders))
     .sort((a, b) => (a.title || '').toLowerCase() < (b.title || '').toLowerCase() ? -1 : 1);
+}
+
+function getMamaData() {
+  const folders = _mamaNormalized();
+  if (!folders.length) return { series: [], standalones: [] };
+
+  const inMama = movies.filter(m => !m.file_deleted && _inFolder(m, folders));
+
+  const seriesMap  = {};
+  const standalones = [];
+  for (const m of inMama) {
+    if (m.is_series && m.series_name) {
+      if (!seriesMap[m.series_name])
+        seriesMap[m.series_name] = { name: m.series_name, seasons: new Set(), episodes: [] };
+      seriesMap[m.series_name].seasons.add(m.season);
+      seriesMap[m.series_name].episodes.push(m);
+    } else {
+      standalones.push(m);
+    }
+  }
+
+  const series = Object.values(seriesMap)
+    .sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1)
+    .map(s => ({
+      name:     s.name,
+      seasons:  [...s.seasons].filter(Boolean).sort((a, b) => a - b),
+      episodes: s.episodes.sort((a, b) => (a.season - b.season) || (a.episode - b.episode))
+    }));
+
+  return {
+    series,
+    standalones: standalones.sort((a, b) =>
+      (a.title || '').toLowerCase() < (b.title || '').toLowerCase() ? -1 : 1
+    )
+  };
 }
 
 function getMamaRecent(limit = 12) {
@@ -206,11 +246,7 @@ function getMamaRecent(limit = 12) {
   if (!folders.length) return [];
   const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
   return movies
-    .filter(m =>
-      !m.file_deleted &&
-      (m.file_mtime || 0) >= cutoff &&
-      folders.some(f => path.normalize(m.file_path).startsWith(f))
-    )
+    .filter(m => !m.file_deleted && (m.file_mtime || 0) >= cutoff && _inFolder(m, folders))
     .sort((a, b) => (b.file_mtime || 0) - (a.file_mtime || 0))
     .slice(0, limit);
 }
@@ -342,6 +378,7 @@ module.exports = {
   getWatchProgress, saveWatchProgress, getLastWatched,
   getHistory, getUnwatched, markFilesDeleted,
   getGroupData, getTotalCount,
+  getMamaData,
   markFolderDeleted, clearHistory, factoryReset,
   DATA_DIR, THUMBS_DIR
 };

@@ -52,12 +52,12 @@ document.getElementById('lang-btn').addEventListener('click', async () => {
 
 // ── Mama ──────────────────────────────────────────────────────────────────────
 async function renderMama() {
-  const [mamaMovies, mamaRecent] = await Promise.all([
-    api.getMamaMovies(),
+  const [mamaData, mamaRecent] = await Promise.all([
+    api.getMamaData(),
     api.getMamaRecent(),
   ]);
 
-  // New additions row
+  // Recent additions carousel
   const newSec = document.getElementById('mama-new-section');
   const newRow = document.getElementById('mama-new-row');
   const newCnt = document.getElementById('mama-new-count');
@@ -71,13 +71,44 @@ async function renderMama() {
     newSec.style.display = 'none';
   }
 
-  // All mama movies grid
+  // Series accordion + standalone grid (like Series tab)
   const grid = document.getElementById('mama-grid');
-  if (!mamaMovies.length) {
+  const { series, standalones } = mamaData;
+
+  if (!series.length && !standalones.length) {
     grid.innerHTML = emptyState('fas fa-heart', t('mama_empty'));
     return;
   }
-  grid.innerHTML = mamaMovies.map(m => movieCardHTML(m, false)).join('');
+
+  let html = series.map(s => {
+    const bySeasons   = groupBy(s.episodes, e => e.season);
+    const seasonsHTML = Object.entries(bySeasons).map(([season, eps]) => `
+      <div class="season-label">${t('season')} ${season}</div>
+      <div class="grid">${eps.map(m => movieCardHTML(m, false)).join('')}</div>
+    `).join('');
+    return `
+      <div class="series-group open" data-series="${esc(s.name)}">
+        <div class="series-header">
+          <span class="series-chevron"><i class="fas fa-chevron-right"></i></span>
+          <span class="series-name">${esc(s.name)}</span>
+          <span class="series-count">${s.episodes.length} ${t('episodes')} · ${s.seasons.length} ${t('seasons')}</span>
+        </div>
+        <div class="series-body">${seasonsHTML}</div>
+      </div>`;
+  }).join('');
+
+  if (standalones.length) {
+    if (series.length) html += `<div class="section-title" style="margin-top:24px">
+      <i class="fas fa-heart" style="color:#e91e8c"></i>
+      <span>${t('mama_all')}</span>
+    </div>`;
+    html += `<div class="grid">${standalones.map(m => movieCardHTML(m, false)).join('')}</div>`;
+  }
+
+  grid.innerHTML = html;
+  grid.querySelectorAll('.series-header').forEach(h => {
+    h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+  });
   bindCardClicks(grid);
 }
 
@@ -112,6 +143,7 @@ let lastSeries  = [];
     showToast(t('scan_complete_toast'));
     refresh();
   });
+  api.onPlayerClosed(() => refresh());
 })();
 
 async function refresh() {
