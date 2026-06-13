@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Films Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Animated SVG background — rotates slowly, scaled to fill window -->
+<div class="bg-layer" aria-hidden="true"></div>
+
+<header class="header">
+  <div class="logo">
+    <i class="fas fa-film"></i>
+    <span data-i18n="app_title">Домашній кінотеатр</span>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-btn active" data-page="home"     data-i18n="nav_home">Головна</button>
+    <button class="nav-btn"        data-page="films"    data-i18n="nav_films">Фільми</button>
+    <button class="nav-btn"        data-page="series"   data-i18n="nav_series">Серіали</button>
+    <button class="nav-btn" data-page="history" data-i18n="nav_history">Історія</button>
+    <button class="nav-btn nav-mama" data-page="mama">
+      <i class="fas fa-heart"></i>
+      <span data-i18n="nav_mama">Мама</span>
+    </button>
+    <button class="nav-btn"        data-page="settings" data-i18n="nav_settings">Налаштування</button>
+  </nav>
+
+  <div class="search-wrap">
+    <i class="fas fa-search search-icon"></i>
+    <input type="text" id="search" data-i18n-ph="search_ph" placeholder="Пошук фільмів..." autocomplete="off">
+  </div>
+
+  <!-- Language toggle -->
+  <button class="lang-toggle-btn" id="lang-btn">
+    <i class="fas fa-language"></i>
+    <span id="lang-label-text">Мова</span>
+  </button>
+
+  <!-- Custom window controls -->
+  <div class="win-controls">
+    <button class="win-btn" id="btn-min" title="Мінімізувати"><i class="fas fa-minus"></i></button>
+    <button class="win-btn" id="btn-max" title="Розгорнути"><i class="fas fa-square"></i></button>
+    <button class="win-btn win-close" id="btn-close" title="Закрити"><i class="fas fa-times"></i></button>
+  </div>
+</header>
+
+<main class="content">
+
+  <!-- ── Home ─────────────────────────────────────────────────────── -->
+  <div class="page active" id="page-home">
+
+    <section id="continue-section" style="display:none">
+      <div class="section-title">
+        <i class="fas fa-play-circle"></i>
+        <span data-i18n="continue_title">Продовжити перегляд</span>
+      </div>
+      <div id="continue-card"></div>
+    </section>
+
+    <section class="row-wrap" id="new-section" style="display:none">
+      <div class="section-title">
+        <i class="fas fa-star"></i>
+        <span data-i18n="new_title">Новинки</span>
+        <span class="badge" id="new-count"></span>
+      </div>
+      <div class="carousel-wrap">
+        <button class="carousel-nav carousel-prev hidden" id="new-prev" aria-label="Prev"><i class="fas fa-chevron-left"></i></button>
+        <div class="row" id="new-row"></div>
+        <button class="carousel-nav carousel-next" id="new-next" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </section>
+
+    <section class="grid-wrap">
+      <div class="section-title">
+        <i class="fas fa-video"></i>
+        <span data-i18n="movies_title">Фільми</span>
+      </div>
+      <div class="grid" id="movies-grid"></div>
+    </section>
+
+  </div>
+
+  <!-- ── Films ─────────────────────────────────────────────────────── -->
+  <div class="page" id="page-films">
+
+    <div class="section-title">
+      <i class="fas fa-video"></i>
+      <span data-i18n="films_title">Всі фільми</span>
+    </div>
+
+    <div class="genre-chips" id="genre-chips">
+      <button class="genre-chip active" data-genre="">
+        <i class="fas fa-border-all"></i>
+        <span data-i18n="all_genres">Всі</span>
+      </button>
+    </div>
+
+    <div class="grid" id="films-grid"></div>
+
+  </div>
+
+  <!-- ── Historia ─────────────────────────────────────────────────── -->
+  <div class="page" id="page-history">
+
+    <div class="history-tabs">
+      <button class="hist-tab-btn active" data-list="unwatched" data-i18n="hist_unwatched">Не переглянуті</button>
+      <button class="hist-tab-btn"        data-list="watched"   data-i18n="hist_watched">Переглянуті</button>
+    </div>
+
+    <div id="hist-unwatched-list" class="hist-list"></div>
+    <div id="hist-watched-list"   class="hist-list" style="display:none"></div>
+
+  </div>
+
+  <!-- ── Mama ──────────────────────────────────────────────────────── -->
+  <div class="page" id="page-mama">
+
+    <section class="row-wrap" id="mama-new-section" style="display:none">
+      <div class="section-title">
+        <i class="fas fa-star"></i>
+        <span data-i18n="new_title">Новинки</span>
+        <span class="badge" id="mama-new-count"></span>
+      </div>
+      <div class="carousel-wrap">
+        <button class="carousel-nav carousel-prev hidden" id="mama-new-prev" aria-label="Prev"><i class="fas fa-chevron-left"></i></button>
+        <div class="row" id="mama-new-row"></div>
+        <button class="carousel-nav carousel-next" id="mama-new-next" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </section>
+
+    <div class="section-title">
+      <i class="fas fa-heart" style="color:#e91e8c"></i>
+      <span data-i18n="mama_all">Фільми Мама</span>
+    </div>
+    <div class="grid" id="mama-grid"></div>
+
+  </div>
+
+  <!-- ── Series ────────────────────────────────────────────────────── -->
+  <div class="page" id="page-series">
+    <div class="section-title">
+      <i class="fas fa-tv"></i>
+      <span data-i18n="nav_series">Серіали</span>
+    </div>
+    <div id="series-list"></div>
+  </div>
+
+  <!-- ── Settings ──────────────────────────────────────────────────── -->
+  <div class="page" id="page-settings">
+    <div class="settings-panel">
+
+      <div class="settings-section">
+        <h3><i class="fas fa-folder-open"></i> <span data-i18n="settings_folders">Папки з відео</span></h3>
+        <div class="folder-list" id="folder-list"></div>
+        <button class="btn btn-outline" id="btn-add-folder">
+          <i class="fas fa-plus"></i>
+          <span data-i18n="add_folder">Додати папку</span>
+        </button>
+      </div>
+
+      <div class="settings-section">
+        <h3><i class="fas fa-sync-alt"></i> <span data-i18n="settings_scan">Сканування</span></h3>
+        <button class="btn btn-primary" id="btn-scan">
+          <i class="fas fa-search"></i>
+          <span data-i18n="scan_btn">Сканувати зараз</span>
+        </button>
+        <span class="status-msg" id="scan-status"></span>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer class="app-footer">
+  <span class="footer-stat">
+    <i class="fas fa-film"></i>
+    <b id="stat-films">0</b>
+    <span data-i18n="stats_films">фільмів</span>
+  </span>
+  <span class="footer-dot">·</span>
+  <span class="footer-stat">
+    <i class="fas fa-tv"></i>
+    <b id="stat-series">0</b>
+    <span data-i18n="stats_series">серіалів</span>
+  </span>
+  <span class="footer-dot">·</span>
+  <span class="footer-stat">
+    <i class="fas fa-hdd"></i>
+    <b id="stat-files">0</b>
+    <span data-i18n="stats_files">файлів</span>
+  </span>
+  <span class="footer-formats">mp4 · mkv · avi · mov · wmv · flv · m4v · ts · m2ts · webm · ogv · 3gp · rmvb · divx</span>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

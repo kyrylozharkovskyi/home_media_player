@@ -1,0 +1,36 @@
+{
+  "name": "films-portal",
+  "version": "1.0.0",
+  "description": "Lokalny portal filmowy",
+  "main": "main.js",
+  "scripts": {
+    "start": "SET ELECTRON_RUN_AS_NODE= && electron .",
+    "rebuild": "echo no native modules",
+    "build": "electron-builder --win"
+  },
+  "dependencies": {
+    "express": "^4.18.3",
+    "ffmpeg-static": "^5.2.0",
+    "ffprobe-static": "^3.1.0",
+    "fluent-ffmpeg": "^2.1.3",
+    "video.js": "^8.23.7"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.films.portal",
+    "productName": "Films Portal",
+    "win": {
+      "target": "nsis"
+    },
+    "files": [
+      "electron.js",
+      "preload.js",
+      "src/**",
+      "renderer/**",
+      "assets/**"
+    ]
+  }
+}

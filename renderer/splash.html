@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      background: #0a0a0a;
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #e8e4de;
+      -webkit-app-region: drag;
+      user-select: none;
+    }
+
+    .logo {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, calc(-50% - 10vh));
+      display: flex; align-items: center; gap: 14px;
+      font-size: 21px; letter-spacing: 1.2px;
+      white-space: nowrap;
+    }
+    .logo svg { width: 34px; height: 34px; color: #e8b84b; fill: #e8b84b; flex-shrink: 0; }
+    .logo span { font-weight: 500; }
+
+    .stage {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 55%;
+      pointer-events: none;
+    }
+
+    shape {
+      position: absolute;
+      display: block;
+      left: 50%; bottom: 0;
+      --base_scale: 5vh;
+      --color: #836ee5;
+      --rotation: 0deg;
+      --bounce-variance: 0vh;
+      margin-left: calc(-1 * (var(--base_scale) / 2));
+    }
+    shape.circle {
+      width: var(--base_scale); height: var(--base_scale);
+      background: var(--color); border-radius: 50%;
+    }
+    shape.semi-circle {
+      height: calc(var(--base_scale) * 2); width: var(--base_scale);
+      background: var(--color);
+      border-bottom-right-radius: calc(var(--base_scale) * 2);
+      border-top-right-radius:    calc(var(--base_scale) * 2);
+    }
+    shape.square {
+      width: var(--base_scale); height: var(--base_scale);
+      background: var(--color);
+    }
+    shape.rectangle {
+      width: calc(var(--base_scale) * 1.5); height: var(--base_scale);
+      background: var(--color);
+    }
+    shape.triangle {
+      width: 0; height: 0;
+      border-bottom: var(--base_scale) solid var(--color);
+      border-right:  var(--base_scale) solid transparent;
+    }
+    shape.triangle-2 {
+      width: 0; height: 0;
+      border-top:  var(--base_scale) solid var(--color);
+      border-left: var(--base_scale) solid transparent;
+    }
+    shape.bounce-up {
+      --bounce-height: calc(-1 * 36vh - calc(var(--base_scale) - var(--bounce-variance)));
+      transition: transform 400ms cubic-bezier(0.215, 0.61, 0.355, 1);
+      transform: translateY(var(--bounce-height)) rotate(0deg);
+    }
+    shape.bounce-down {
+      transition: transform 300ms cubic-bezier(0.6, 0.04, 0.98, 0.335);
+      transform: translateY(0) rotate(var(--rotation));
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo">
+    <!-- film strip icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
+    </svg>
+    <span>Домашній кінотеатр</span>
+  </div>
+
+  <div class="stage">
+    <shape></shape>
+    <shape></shape>
+    <shape></shape>
+  </div>
+
+  <script>
+  (function () {
+    var types  = ['circle','semi-circle','square','triangle','triangle-2','rectangle'];
+    var colors = ['#836ee5','#fe94b4','#49d2f5','#ff5354','#00b1b4','#ffe465','#0071ff','#e8b84b','#03274b'];
+    var shapes = document.querySelectorAll('shape');
+
+    shapes.forEach(function (shape, idx) {
+      function bounce() {
+        shape.className = '';
+        shape.classList.add(types[~~(Math.random() * types.length)]);
+        var offset = (Math.random() * 8) - 4;
+        var sign   = offset >= 0 ? '+ ' : '- ';
+        [
+          ['left',              'calc(50% ' + sign + Math.abs(offset).toFixed(2) + 'vw)'],
+          ['--bounce-variance', ((Math.random() * 18) - 9).toFixed(1) + 'vh'],
+          ['--base_scale',      ((Math.random() * 5)  + 3).toFixed(1) + 'vh'],
+          ['--rotation',        ((Math.random() * 200) - 100).toFixed(0) + 'deg'],
+          ['--color',           colors[~~(Math.random() * colors.length)]],
+        ].forEach(function (s) { shape.style.setProperty(s[0], s[1]); });
+        shape.classList.add('bounce-up');
+        setTimeout(function () { shape.classList.replace('bounce-up', 'bounce-down'); }, 400);
+      }
+      setTimeout(function () {
+        bounce();
+        setInterval(bounce, 740);
+      }, idx * 246);
+    });
+  })();
+  </script>
+</body>
+</html>

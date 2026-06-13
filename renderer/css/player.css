@@ -1,0 +1,192 @@
+/* ── Base ─────────────────────────────────────────────────────────── */
+.player-body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; }
+
+.player-wrap { position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #000; }
+
+#vid.video-js { position: absolute; top: 0; left: 0; width: 100% !important; height: 100% !important; z-index: 1; }
+.video-js .vjs-tech { object-fit: contain; }
+
+/* Hide VJS progress (we have custom seekbar) and fullscreen (we have custom button) */
+.video-js .vjs-progress-control   { display: none !important; }
+.video-js .vjs-fullscreen-control { display: none !important; }
+/* Give VJS right padding so our PCR overlay doesn't overlap time/rate controls */
+.video-js .vjs-control-bar { padding-right: 148px !important; box-sizing: border-box; }
+
+/* ── Top header ──────────────────────────────────────────────────── */
+.player-header {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; gap: 12px;
+  /* left padding leaves room for fixed back-btn (~110px wide at left:16px) */
+  padding: 12px 16px 12px 148px;
+  background: linear-gradient(to bottom, rgba(0,0,0,.85) 0%, transparent 100%);
+  opacity: 0; transition: opacity .3s; pointer-events: none;
+}
+.player-wrap.show-ui .player-header { opacity: 1; pointer-events: all; }
+
+/* Back button — lives OUTSIDE player-wrap, last in <body>; nothing can be above it */
+.back-btn {
+  position: fixed !important;
+  top: 12px; left: 16px;
+  z-index: 99999 !important;
+  display: flex !important; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: 5px;
+  background: rgba(0,0,0,.65); border: 1px solid rgba(255,255,255,.25);
+  color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; cursor: pointer;
+  transition: opacity .2s, background .2s, border-color .2s, color .2s;
+  pointer-events: all !important;
+  opacity: 0.55; backdrop-filter: blur(6px);
+  -webkit-app-region: no-drag;
+}
+.back-btn:hover { opacity: 1; background: rgba(232,184,75,.2); border-color: #e8b84b; color: #e8b84b; }
+/* fade in/out with UI — but always clickable */
+.player-body:not(.show-ui-body) .back-btn { opacity: 0.55; }
+.player-body.show-ui-body .back-btn { opacity: 1; }
+
+.player-title {
+  flex: 1; font-size: 14px; font-weight: 500; color: rgba(255,255,255,.85);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.close-app-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 4px; flex-shrink: 0;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2);
+  color: rgba(255,255,255,.6); font-size: 13px; cursor: pointer; transition: all .2s;
+}
+.close-app-btn:hover { background: rgba(220,53,69,.3); border-color: #ff6b6b; color: #ff6b6b; }
+
+/* ── Custom seekbar ──────────────────────────────────────────────── */
+.custom-seekbar {
+  position: absolute; left: 0; right: 0; bottom: 52px;
+  height: 22px; z-index: 150; cursor: pointer;
+  display: flex; align-items: center; padding: 0 14px; box-sizing: border-box;
+  opacity: 0; transition: opacity .3s;
+}
+.player-wrap.show-ui .custom-seekbar { opacity: 1; }
+
+.seek-track {
+  position: relative; width: 100%; height: 3px;
+  background: rgba(255,255,255,.2); border-radius: 3px;
+  transition: height .15s; flex-shrink: 0;
+}
+.custom-seekbar:hover .seek-track { height: 5px; }
+
+.seek-buffer { position: absolute; top: 0; left: 0; height: 100%; background: rgba(255,255,255,.25); border-radius: 3px; pointer-events: none; width: 0; }
+.seek-fill   { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg,#ffd060,#e8b84b); border-radius: 3px; pointer-events: none; width: 0; }
+.seek-thumb  { position: absolute; top: 50%; width: 13px; height: 13px; background: #e8b84b; border-radius: 50%; transform: translate(-50%,-50%); pointer-events: none; opacity: 0; transition: opacity .15s; left: 0; }
+.custom-seekbar:hover .seek-thumb { opacity: 1; }
+
+.seek-tooltip {
+  position: absolute; bottom: 26px;
+  background: rgba(0,0,0,.88); color: #fff; font-size: 11px;
+  padding: 2px 8px; border-radius: 3px; white-space: nowrap;
+  pointer-events: none; transform: translateX(-50%); opacity: 0; left: 0;
+  transition: opacity .15s; font-family: 'Inter', sans-serif;
+}
+
+/* ── PCR — right-side controls overlay ──────────────────────────── */
+/* floats at bottom-right, same height as VJS control bar           */
+.pcr {
+  position: absolute; bottom: 0; right: 0; z-index: 160;
+  display: flex; align-items: center; gap: 0;
+  padding: 0 6px 4px 0;
+  height: 52px; /* match VJS control bar area */
+  opacity: 0; transition: opacity .3s;
+}
+.player-wrap.show-ui .pcr { opacity: 1; }
+
+.pcr-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 44px; height: 40px; padding: 0 10px;
+  border: none; background: none; cursor: pointer;
+  color: rgba(255,255,255,.8); border-radius: 4px;
+  transition: color .2s; position: relative; user-select: none;
+}
+.pcr-btn i { font-size: 15px; pointer-events: none; }
+
+.pcr-label {
+  font-size: 9px; text-transform: uppercase; letter-spacing: .4px;
+  margin-top: 3px; opacity: 0; transition: opacity .2s; white-space: nowrap;
+  pointer-events: none;
+}
+.pcr-btn:hover { color: #e8b84b; }
+.pcr-btn:hover .pcr-label { opacity: 1; }
+
+/* Disabled Мова when single audio track */
+.pcr-group.disabled { opacity: .3; pointer-events: none; }
+
+/* CC — greyed until available */
+.pcr-cc           { opacity: .35; pointer-events: none; }
+.pcr-cc.available { opacity: 1;  pointer-events: all; }
+.pcr-cc.on i, .pcr-cc.on .pcr-label { color: #e8b84b; }
+
+/* ── Мова popup (opens UPWARD) ───────────────────────────────────── */
+.pcr-group { position: relative; }
+
+.pcr-popup {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px); right: 0;
+  background: rgba(10,10,10,.97);
+  border: 1px solid rgba(232,184,75,.28);
+  border-radius: 7px; padding: 4px 0;
+  min-width: 190px; z-index: 300;
+  box-shadow: 0 -8px 24px rgba(0,0,0,.6);
+}
+.pcr-popup.open { display: block; }
+
+.mova-opt {
+  display: block; width: 100%; padding: 9px 16px;
+  text-align: left; color: rgba(255,255,255,.8);
+  font-size: 12px; font-family: 'Inter', sans-serif;
+  background: none; border: none; cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.mova-opt:hover  { color: #e8b84b; background: rgba(232,184,75,.08); }
+.mova-opt.active { color: #e8b84b; font-weight: 600; }
+.mova-opt.active::before { content: '✓ '; }
+
+/* ── VJS Big Play ────────────────────────────────────────────────── */
+.video-js .vjs-big-play-button {
+  width: 70px; height: 70px; line-height: 70px; margin: 0;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  background: rgba(0,0,0,.55); border: 2px solid #e8b84b; border-radius: 50%;
+  transition: all .2s;
+}
+.video-js:hover .vjs-big-play-button,
+.video-js .vjs-big-play-button:hover {
+  background: rgba(232,184,75,.18); box-shadow: 0 0 32px rgba(232,184,75,.45); border-color: #ffd060;
+}
+.video-js .vjs-big-play-button .vjs-icon-placeholder:before { color: #e8b84b; font-size: 30px; line-height: 70px; }
+
+/* ── VJS Control bar ─────────────────────────────────────────────── */
+.video-js .vjs-control-bar {
+  background: linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.5) 70%, transparent 100%);
+  height: 52px; padding: 0 10px; font-family: 'Inter', sans-serif; font-size: 13px;
+  display: flex !important; align-items: center;
+}
+.video-js .vjs-volume-level        { background: #e8b84b; }
+.video-js .vjs-volume-level:before { color: #e8b84b; }
+.video-js .vjs-time-control        { font-size: 12px; padding: 0 4px; }
+.video-js .vjs-current-time,
+.video-js .vjs-duration            { color: rgba(255,255,255,.75); }
+.video-js .vjs-control:hover .vjs-icon-placeholder:before,
+.video-js .vjs-button:hover  .vjs-icon-placeholder:before { color: #e8b84b; }
+
+/* VJS hover labels */
+.video-js .vjs-control { position: relative; }
+.video-js .vjs-control .vjs-control-text {
+  position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.88); color: #fff; font-size: 10px; font-family: 'Inter', sans-serif;
+  padding: 3px 8px; border-radius: 3px; white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity .2s;
+  clip: auto !important; width: auto !important; height: auto !important; overflow: visible !important;
+}
+.video-js .vjs-control:hover .vjs-control-text { opacity: 1; }
+
+/* Playback rate menu */
+.video-js .vjs-menu-content { background: rgba(10,10,10,.96); border: 1px solid rgba(232,184,75,.2); border-radius: 4px; }
+.video-js .vjs-menu li { font-family: 'Inter', sans-serif; font-size: 12px; }
+.video-js .vjs-menu li.vjs-selected,
+.video-js .vjs-menu li.vjs-selected:hover { background: rgba(232,184,75,.18); color: #e8b84b; }
+.video-js .vjs-menu li:hover { color: #e8b84b; }

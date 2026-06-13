@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Домашній кінотеатр</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="../node_modules/video.js/dist/video-js.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/player.css">
+</head>
+<body class="player-body">
+
+<div class="player-wrap" id="player-wrap">
+
+  <!-- ── Top: title + close (no back btn here) ── -->
+  <div class="player-header" id="player-header">
+    <div class="player-title" id="player-title">...</div>
+    <button class="close-app-btn" id="btn-close-app">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- ── Seekbar above control bar ── -->
+  <div class="custom-seekbar" id="custom-seekbar">
+    <div class="seek-track" id="seek-track">
+      <div class="seek-buffer" id="seek-buffer"></div>
+      <div class="seek-fill"   id="seek-fill"></div>
+      <div class="seek-thumb"  id="seek-thumb"></div>
+    </div>
+    <div class="seek-tooltip" id="seek-tooltip"></div>
+  </div>
+
+  <!-- ── Right-side controls: Мова + CC + Fullscreen ── -->
+  <!-- floats over the right side of the VJS control bar -->
+  <div class="pcr" id="pcr">
+
+    <!-- Мова / audio track selector -->
+    <div class="pcr-group" id="pcr-mova">
+      <button class="pcr-btn" id="btn-mova">
+        <i class="fas fa-microphone"></i>
+        <span class="pcr-label" id="mova-label">Мова</span>
+      </button>
+      <!-- popup opens UPWARD -->
+      <div class="pcr-popup" id="mova-popup"></div>
+    </div>
+
+    <!-- CC subtitles -->
+    <button class="pcr-btn pcr-cc" id="btn-cc">
+      <i class="fas fa-closed-captioning"></i>
+      <span class="pcr-label">CC</span>
+    </button>
+
+    <!-- Fullscreen -->
+    <button class="pcr-btn" id="btn-fs">
+      <i class="fas fa-expand" id="fs-icon"></i>
+      <span class="pcr-label" id="fs-label">Повний екран</span>
+    </button>
+
+  </div>
+
+  <!-- ── Video.js (controls: true but fullscreen/progress hidden via CSS) ── -->
+  <video id="vid"
+         class="video-js vjs-default-skin vjs-big-play-centered"
+         preload="auto">
+  </video>
+
+</div>
+
+<!-- Back button: outside player-wrap + last in body = nothing can cover it -->
+<button id="back-btn" class="back-btn">
+  <i class="fas fa-arrow-left"></i>
+  <span data-i18n-player="back">Назад</span>
+</button>
+
+<script src="../node_modules/video.js/dist/video.min.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/player.js"></script>
+</body>
+</html>

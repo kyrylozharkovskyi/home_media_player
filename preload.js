@@ -1,0 +1,31 @@
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('api', {
+  getServerPort:      ()           => ipcRenderer.invoke('get-server-port'),
+  getMovies:          (filter)     => ipcRenderer.invoke('get-movies', filter),
+  getSeries:          ()           => ipcRenderer.invoke('get-series'),
+  getRecent:          ()           => ipcRenderer.invoke('get-recent'),
+  getMovieInfo:       (id)         => ipcRenderer.invoke('get-movie-info', id),
+  getSettings:        (key)        => ipcRenderer.invoke('get-settings', key),
+  saveSettings:       (key, val)   => ipcRenderer.invoke('save-settings', key, val),
+  scanNow:            ()           => ipcRenderer.invoke('scan-now'),
+  selectFolder:       ()           => ipcRenderer.invoke('select-folder'),
+  getWatchProgress:   (id)         => ipcRenderer.invoke('get-watch-progress', id),
+  saveWatchProgress:  (id, pos)    => ipcRenderer.invoke('save-watch-progress', id, pos),
+  getLastWatched:     ()           => ipcRenderer.invoke('get-last-watched'),
+  getGenres:          ()           => ipcRenderer.invoke('get-genres'),
+  goHome:             ()           => ipcRenderer.send('go-home'),
+  getMamaMovies:      ()           => ipcRenderer.invoke('get-mama-movies'),
+  getMamaRecent:      ()           => ipcRenderer.invoke('get-mama-recent'),
+  getHistory:         ()           => ipcRenderer.invoke('get-history'),
+  getUnwatched:       ()           => ipcRenderer.invoke('get-unwatched'),
+  getGroupData:       (fp)         => ipcRenderer.invoke('get-group-data', fp),
+  openPlayer:         (id)         => ipcRenderer.invoke('open-player', id),
+  closePlayer:        ()           => ipcRenderer.send('close-player'),
+  onScanComplete:     (cb)         => ipcRenderer.on('scan-complete', cb),
+  windowControls: {
+    minimize: () => ipcRenderer.send('window-minimize'),
+    maximize: () => ipcRenderer.send('window-maximize'),
+    close:    () => ipcRenderer.send('window-close'),
+  },
+});

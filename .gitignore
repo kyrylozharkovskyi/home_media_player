@@ -1,0 +1,6 @@
+node_modules/
+*.log
+electron_out.txt
+electron_err.txt
+start_debug.bat
+start.bat
