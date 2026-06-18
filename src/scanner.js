@@ -11,7 +11,8 @@ ffmpeg.setFfprobePath(ffprobePath);
 
 const VIDEO_EXT = new Set([
   '.mp4', '.mkv', '.avi', '.mov', '.wmv', '.flv',
-  '.m4v', '.ts', '.m2ts', '.webm', '.ogv', '.3gp', '.rmvb', '.divx'
+  '.m4v', '.ts', '.m2ts', '.mts', '.webm', '.ogv',
+  '.3gp', '.3g2', '.rmvb', '.divx', '.mpg', '.mpeg', '.vob'
 ]);
 
 function isVideo(fp) { return VIDEO_EXT.has(path.extname(fp).toLowerCase()); }
@@ -22,7 +23,11 @@ function thumbKey(fp) {
 
 function probeFile(fp) {
   return new Promise((res, rej) => {
-    ffmpeg.ffprobe(fp, (err, meta) => err ? rej(err) : res(meta));
+    const timer = setTimeout(() => rej(new Error('ffprobe timeout')), 30000);
+    ffmpeg.ffprobe(fp, (err, meta) => {
+      clearTimeout(timer);
+      err ? rej(err) : res(meta);
+    });
   });
 }
 
